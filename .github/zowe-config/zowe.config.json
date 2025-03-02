@@ -1,0 +1,55 @@
+{
+    "$schema": "./zowe.schema.json",
+    "profiles": {
+        "zOSZXP": {
+            "type": "zosmf",
+            "properties": {
+                "host": "${ZOSMF_HOST}",
+                "port": 10443,
+                "rejectUnauthorized": false
+            }
+        },
+        "tso": {
+            "type": "tso",
+            "properties": {
+                "account": "",
+                "codePage": "1047",
+                "logonProcedure": "IZUFPROC"
+            },
+            "secure": []
+        },
+        "ssh": {
+            "type": "ssh",
+            "properties": {
+                "port": 22
+            },
+            "secure": []
+        },
+        "rse": {
+            "type": "rse",
+            "properties": {
+                "port": 6800,
+                "basePath": "rseapi",
+                "protocol": "https"
+            },
+            "secure": []
+        },
+        "zos_base": {
+            "type": "base",
+            "properties": {
+                "host": "204.90.115.200",
+                "rejectUnauthorized": false,
+                "user": "${ZOSMF_USER}",
+                "password": "${ZOSMF_PASSWORD}"
+            }
+        }
+    },
+    "defaults": {
+        "zosmf": "zOSZXP",
+        "tso": "tso",
+        "ssh": "ssh",
+        "rse": "rse",
+        "base": "zos_base"
+    },
+    "autoStore": true
+}

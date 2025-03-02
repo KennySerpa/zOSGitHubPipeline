@@ -1,0 +1,7 @@
+# Ignore Zowe config files in root
+/zowe.config.json
+/zowe.schema.json
+
+# But allow them in .github/zowe-config
+!.github/zowe-config/zowe.config.json
+!.github/zowe-config/zowe.schema.json

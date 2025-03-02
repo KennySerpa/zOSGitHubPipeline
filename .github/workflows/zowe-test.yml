@@ -1,0 +1,36 @@
+name: Zowe Simple Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-zowe:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install Zowe CLI
+        run: npm install -g @zowe/cli
+      
+      - name: Setup Zowe configuration
+        # Our Config files are staged in .github/zowe-config with placeholders for substitution
+        # The sed command will substitute GITHUB secrets values into our placeholders when staged.
+        run: |
+          mkdir -p ~/.zowe
+          cp .github/zowe-config/zowe.schema.json ~/.zowe/
+          cat .github/zowe-config/zowe.config.json | \
+            sed "s|\${ZOSMF_HOST}|${{ secrets.ZOSMF_HOST }}|g" | \
+            sed "s|\${ZOSMF_USER}|${{ secrets.ZOSMF_USER }}|g" | \
+            sed "s|\${ZOSMF_PASSWORD}|${{ secrets.ZOSMF_PASSWORD }}|g" > ~/.zowe/zowe.config.json
+      
+      - name: Run Zowe command
+        run: |
+          zowe zos-files list am '${{ vars.PDS_HLQ }}.${{ vars.PDS_Second_Qual }}'
+
