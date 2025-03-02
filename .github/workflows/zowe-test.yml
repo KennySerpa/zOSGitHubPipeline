@@ -7,6 +7,9 @@ jobs:
   test-zowe:
     runs-on: ubuntu-latest
     environment: test
+    permissions:
+      contents: read
+      id-token: write # Attemp to see if permisisons matter
     
     steps:
       - name: Checkout code
