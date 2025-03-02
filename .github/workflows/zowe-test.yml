@@ -6,10 +6,11 @@ on:
 jobs:
   test-zowe:
     runs-on: ubuntu-latest
-    environment: Test
+    environment: test
     permissions:
       contents: read
-      id-token: write # Attemp to see if permisisons matter
+      deployments: write
+      id-token: write 
     
     steps:
       - name: Checkout code
