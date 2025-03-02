@@ -6,7 +6,7 @@ on:
 jobs:
   test-zowe:
     runs-on: ubuntu-latest
-    environment: test
+    environment: Test
     permissions:
       contents: read
       id-token: write # Attemp to see if permisisons matter
