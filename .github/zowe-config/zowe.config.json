@@ -37,7 +37,7 @@
         "zos_base": {
             "type": "base",
             "properties": {
-                "host": "204.90.115.200",
+                "host": "${ZOSMF_HOST}",
                 "rejectUnauthorized": false,
                 "user": "${ZOSMF_USER}",
                 "password": "${ZOSMF_PASSWORD}"

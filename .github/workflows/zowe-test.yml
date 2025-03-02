@@ -33,5 +33,5 @@ jobs:
       
       - name: Run Zowe command
         run: |
-          zowe zos-files list am '${{ vars.PDS_HLQ }}.${{ vars.PDS_Second_Qual }}'
+          zowe zos-files list am '${{ vars.PDS_HLQ }}.${{ vars.PDS_SECOND_QUAL }}'
 
