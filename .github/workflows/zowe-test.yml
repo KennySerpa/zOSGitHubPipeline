@@ -1,4 +1,4 @@
-name: Zowe Simple Workflow
+name: Zowe Simple Workflow Debug
 
 on:
   workflow_dispatch:
@@ -13,6 +13,31 @@ jobs:
       id-token: write 
     
     steps:
+      - name: Debug GitHub Context
+        run: |
+          echo "======= GITHUB CONTEXT DEBUGGING ======="
+          echo "Configured Environment (hardcoded): test" 
+          echo "GitHub Repository: ${{ github.repository }}"
+          echo "GitHub Actor: ${{ github.actor }}"
+          echo "GitHub Ref: ${{ github.ref }}"
+          echo "GitHub Event Name: ${{ github.event_name }}"
+          
+      - name: Debug Environment Variables
+        run: |
+          echo "======= ENVIRONMENT VARIABLES DEBUGGING ======="
+          echo "PDS_HLQ value: ${{ vars.PDS_HLQ }}"
+          echo "PDS_SECOND_QUAL value: ${{ vars.PDS_SECOND_QUAL }}"
+          
+      - name: Debug Secrets Access
+        run: |
+          echo "======= SECRETS ACCESS DEBUGGING ======="
+          echo "Does ZOSMF_HOST exist? ${{ secrets.ZOSMF_HOST != '' }}"
+          echo "Does ZOSMF_USER exist? ${{ secrets.ZOSMF_USER != '' }}"
+          echo "Does ZOSMF_PASSWORD exist? ${{ secrets.ZOSMF_PASSWORD != '' }}"
+          echo "Raw ZOSMF_HOST value: ${{ secrets.ZOSMF_HOST }}"
+          echo "Raw ZOSMF_USER value: ${{ secrets.ZOSMF_USER }}"
+          echo "Raw ZOSMF_PASSWORD value: ${{ secrets.ZOSMF_PASSWORD }}"
+          
       - name: Checkout code
         uses: actions/checkout@v3
           
@@ -24,6 +49,35 @@ jobs:
       - name: Install Zowe CLI
         run: npm install -g @zowe/cli
       
+      - name: Debug Zowe Config Files
+        run: |
+          echo "======= ZOWE CONFIG FILES DEBUGGING ======="
+          echo "Current directory: $(pwd)"
+          echo "Config directory contents:"
+          ls -la .github/zowe-config/
+          
+          echo "Template config file contents:"
+          cat .github/zowe-config/zowe.config.json
+          
+          echo "Template schema file contents:"
+          cat .github/zowe-config/zowe.schema.json
+      
+      - name: Debug Sed Commands
+        run: |
+          echo "======= SED COMMANDS DEBUGGING ======="
+          echo "Raw substitution command that will be executed:"
+          echo "cat .github/zowe-config/zowe.config.json | sed \"s|\${ZOSMF_HOST}|${{ secrets.ZOSMF_HOST }}|g\" | sed \"s|\${ZOSMF_USER}|${{ secrets.ZOSMF_USER }}|g\" | sed \"s|\${ZOSMF_PASSWORD}|${{ secrets.ZOSMF_PASSWORD }}|g\" > ~/.zowe/zowe.config.json"
+          
+          echo "Step-by-step sed execution:"
+          echo "First sed command result:"
+          cat .github/zowe-config/zowe.config.json | sed "s|\${ZOSMF_HOST}|${{ secrets.ZOSMF_HOST }}|g"
+          
+          echo "Second sed command result:"
+          cat .github/zowe-config/zowe.config.json | sed "s|\${ZOSMF_HOST}|${{ secrets.ZOSMF_HOST }}|g" | sed "s|\${ZOSMF_USER}|${{ secrets.ZOSMF_USER }}|g"
+          
+          echo "Third sed command result:"
+          cat .github/zowe-config/zowe.config.json | sed "s|\${ZOSMF_HOST}|${{ secrets.ZOSMF_HOST }}|g" | sed "s|\${ZOSMF_USER}|${{ secrets.ZOSMF_USER }}|g" | sed "s|\${ZOSMF_PASSWORD}|${{ secrets.ZOSMF_PASSWORD }}|g"
+      
       - name: Setup Zowe configuration
         # Our Config files are staged in .github/zowe-config with placeholders for substitution
         # The sed command will substitute GITHUB secrets values into our placeholders when staged.
@@ -34,8 +88,37 @@ jobs:
             sed "s|\${ZOSMF_HOST}|${{ secrets.ZOSMF_HOST }}|g" | \
             sed "s|\${ZOSMF_USER}|${{ secrets.ZOSMF_USER }}|g" | \
             sed "s|\${ZOSMF_PASSWORD}|${{ secrets.ZOSMF_PASSWORD }}|g" > ~/.zowe/zowe.config.json
+          
+          echo "======= POST-CONFIG DEBUGGING ======="
+          echo "~/.zowe directory contents:"
+          ls -la ~/.zowe/
+          
+          echo "Generated config file contents:"
+          cat ~/.zowe/zowe.config.json
       
+      - name: Debug Zowe Installation
+        run: |
+          echo "======= ZOWE INSTALLATION DEBUGGING ======="
+          echo "Zowe CLI version:"
+          zowe --version
+          
+          echo "Zowe profiles:"
+          zowe profiles list
+          
       - name: Run Zowe command
         run: |
+          echo "======= ZOWE COMMAND DEBUGGING ======="
+          echo "Command that will be executed: zowe zos-files list am '${{ vars.PDS_HLQ }}.${{ vars.PDS_SECOND_QUAL }}'"
+          
           zowe zos-files list am '${{ vars.PDS_HLQ }}.${{ vars.PDS_SECOND_QUAL }}'
-
+          
+      - name: Final Debug Summary
+        if: always()
+        run: |
+          echo "======= FINAL DEBUG SUMMARY ======="
+          echo "Node.js version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "GitHub Actions Runner OS: $(uname -a)"
+          echo "HOME directory: $HOME"
+          echo "Environment variables:"
+          env | sort
